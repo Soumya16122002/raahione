@@ -48,9 +48,9 @@ function App() {
         role,
       });
       alert("User Registered Successfully");
-      console.log(response.data);
+
     } catch (error) {
-      console.log(error);
+
       alert("Registration Failed");
     }
   };
@@ -65,7 +65,7 @@ function App() {
       setCurrentUser(response.data);
       alert("Login Successful");
     } catch (error) {
-      console.log(error);
+
       alert("Login Failed");
     }
   };
@@ -76,7 +76,7 @@ function App() {
       const response = await axios.get(url);
       setRides(response.data);
     } catch (error) {
-      console.log(error);
+
       alert("Ride Search Failed");
     }
   };
@@ -98,7 +98,7 @@ function App() {
       setRecommendations(response.data);
 
     } catch (error) {
-      console.log(error);
+
     }
   };
 
@@ -112,7 +112,7 @@ function App() {
       });
       alert("Ride Booked Successfully");
     } catch (error) {
-      console.log(error);
+
       alert("Booking Failed");
     }
   };
@@ -126,7 +126,7 @@ function App() {
 
       setBookings(response.data);
     } catch (error) {
-      console.log(error);
+
       alert("Failed To Load Bookings");
     }
   };
@@ -144,7 +144,7 @@ function App() {
       setDriverTrips(response.data);
 
     } catch (error) {
-      console.log(error);
+
     }
   };
 
@@ -158,7 +158,7 @@ function App() {
 
       loadBookings();
     } catch (error) {
-      console.log(error);
+
       alert("Cancel Failed");
     }
   };
@@ -171,7 +171,7 @@ function App() {
       const response = await axios.get(
         "https://raahione-backend-production-321b.up.railway.app/bookings/driver/" + user.id
       );
-      console.log(response.data);
+
 
       setDriverBookings(
         response.data.filter(
@@ -186,7 +186,7 @@ function App() {
       );
 
     } catch (error) {
-      console.log(error);
+
     }
   };
   const approveBooking = async (bookingId) => {
@@ -199,7 +199,7 @@ function App() {
       loadDriverBookings();
 
     } catch (error) {
-      console.log(error);
+
     }
   };
 
@@ -213,7 +213,7 @@ function App() {
       loadDriverBookings();
 
     } catch (error) {
-      console.log(error);
+
     }
   };
 
@@ -235,10 +235,10 @@ function App() {
       );
 
       alert("Ride Created Successfully");
-      console.log(response.data);
+
 
     } catch (error) {
-      console.log(error);
+
       alert("Ride Creation Failed");
     }
   };
@@ -298,7 +298,7 @@ function App() {
       alert("Cannot delete ride");
     }
   };
-  console.log(loggedUser);
+  
 
   return (
     <div style={{ padding: "30px" }}>
