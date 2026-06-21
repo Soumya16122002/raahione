@@ -41,7 +41,7 @@ function App() {
     return;
   }
     try {
-      const response = await axios.post("http://localhost:8080/users/register", {
+      const response = await axios.post("https://raahione-backend-production-321b.up.railway.app/users/register", {
         name,
         email,
         password,
@@ -57,7 +57,7 @@ function App() {
 
   const login = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/users/login", {
+      const response = await axios.post("https://raahione-backend-production-321b.up.railway.app/users/login", {
         email: loginEmail,
         password: loginPassword,
       });
@@ -72,7 +72,7 @@ function App() {
 
   const searchRides = async () => {
     try {
-      const url = "http://localhost:8080/rides/search?source=" + source + "&destination=" + destination;
+      const url = "https://raahione-backend-production-321b.up.railway.app/rides/search?source=" + source + "&destination=" + destination;
       const response = await axios.get(url);
       setRides(response.data);
     } catch (error) {
@@ -88,7 +88,7 @@ function App() {
       );
 
       const response = await axios.post(
-        "http://localhost:8080/recommendations",
+        "https://raahione-backend-production-321b.up.railway.app/recommendations",
         {
           userId: user.id,
           currentSource: source
@@ -105,7 +105,7 @@ function App() {
   const bookRide = async (rideId) => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      await axios.post("http://localhost:8080/bookings", {
+      await axios.post("https://raahione-backend-production-321b.up.railway.app/bookings", {
         userId: user.id,
         rideId: rideId,
         seatsBooked: 1,
@@ -121,7 +121,7 @@ function App() {
       const user = JSON.parse(localStorage.getItem("user"));
 
       const response = await axios.get(
-        "http://localhost:8080/bookings/history/" + user.id
+        "https://raahione-backend-production-321b.up.railway.app/bookings/history/" + user.id
       );
 
       setBookings(response.data);
@@ -138,7 +138,7 @@ function App() {
       );
 
       const response = await axios.get(
-        "http://localhost:8080/rides/driver/" + user.id
+        "https://raahione-backend-production-321b.up.railway.app/rides/driver/" + user.id
       );
 
       setDriverTrips(response.data);
@@ -151,7 +151,7 @@ function App() {
   const cancelBooking = async (bookingId) => {
     try {
       await axios.put(
-        "http://localhost:8080/bookings/cancel/" + bookingId
+        "https://raahione-backend-production-321b.up.railway.app/bookings/cancel/" + bookingId
       );
 
       alert("Booking Cancelled");
@@ -169,7 +169,7 @@ function App() {
       );
 
       const response = await axios.get(
-        "http://localhost:8080/bookings/driver/" + user.id
+        "https://raahione-backend-production-321b.up.railway.app/bookings/driver/" + user.id
       );
       console.log(response.data);
 
@@ -193,7 +193,7 @@ function App() {
     try {
 
       await axios.put(
-        "http://localhost:8080/bookings/approve/" + bookingId
+        "https://raahione-backend-production-321b.up.railway.app/bookings/approve/" + bookingId
       );
 
       loadDriverBookings();
@@ -207,7 +207,7 @@ function App() {
     try {
 
       await axios.put(
-        "http://localhost:8080/bookings/reject/" + bookingId
+        "https://raahione-backend-production-321b.up.railway.app/bookings/reject/" + bookingId
       );
 
       loadDriverBookings();
@@ -224,7 +224,7 @@ function App() {
       );
 
       const response = await axios.post(
-        "http://localhost:8080/rides",
+        "https://raahione-backend-production-321b.up.railway.app/rides",
         {
           source: rideSource,
           destination: rideDestination,
@@ -244,28 +244,28 @@ function App() {
   };
   const loadUsers = async () => {
     const response = await axios.get(
-      "http://localhost:8080/users"
+      "https://raahione-backend-production-321b.up.railway.app/users"
     );
     setUsers(response.data);
   };
 
   const loadAllRides = async () => {
     const response = await axios.get(
-      "http://localhost:8080/rides"
+      "https://raahione-backend-production-321b.up.railway.app/rides"
     );
     setAllRides(response.data);
   };
 
   const loadAllBookings = async () => {
     const response = await axios.get(
-      "http://localhost:8080/admin/bookings"
+      "https://raahione-backend-production-321b.up.railway.app/admin/bookings"
     );
     setAllBookings(response.data);
   };
 
   const loadAnalytics = async () => {
     const response = await axios.get(
-      "http://localhost:8080/admin/analytics"
+      "https://raahione-backend-production-321b.up.railway.app/admin/analytics"
     );
     setAnalytics(response.data);
   };
@@ -273,7 +273,7 @@ function App() {
   const deleteUser = async (userId) => {
     try {
       await axios.delete(
-        "http://localhost:8080/users/" + userId
+        "https://raahione-backend-production-321b.up.railway.app/users/" + userId
       );
 
       loadUsers();
@@ -289,7 +289,7 @@ function App() {
   const deleteRide = async (rideId) => {
     try {
       await axios.delete(
-        "http://localhost:8080/rides/" + rideId
+        "https://raahione-backend-production-321b.up.railway.app/rides/" + rideId
       );
 
       loadAllRides();
