@@ -1,10 +1,9 @@
 services:
   - type: web
     name: raahione-backend
-    runtime: java
+    env: docker
     rootDir: backend
-    buildCommand: mvn clean package
-    startCommand: java -jar target/*.jar
+    dockerfilePath: backend/Dockerfile
     envVars:
       - key: DB_URL
         sync: false
