@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
-const API_BASE_URL = "raahione-backend-production.up.railway.app";
+const API_BASE_URL = "https://raahione-backend-production-321b.up.railway.app/";
 axios.interceptors.request.use((config) => {
 
   const token = localStorage.getItem("token");
