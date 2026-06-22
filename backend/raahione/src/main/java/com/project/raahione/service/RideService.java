@@ -21,6 +21,7 @@ public class RideService {
 
     public Ride createRide(RideRequest request) {
 
+
         User driver =
                 userService.getUserById(request.getDriverId());
 
@@ -35,18 +36,25 @@ public class RideService {
         ride.setSource(request.getSource());
         ride.setDestination(request.getDestination());
         ride.setDepartureTime(request.getDepartureTime());
+        ride.setTravelDate(request.getTravelDate());
+        ride.setTravelTime(request.getTravelTime());
         ride.setAvailableSeats(request.getAvailableSeats());
         ride.setDriver(driver);
+        ride.setStatus("ACTIVE");
+
 
         return rideRepository.save(ride);
     }
-    public List<Ride> searchRides(String source,
-                                  String destination) {
+    public List<Ride> searchRides(
+            String source,
+            String destination,
+            String travelDate) {
 
         return rideRepository
-                .findBySourceIgnoreCaseAndDestinationIgnoreCase(
+                .findBySourceIgnoreCaseAndDestinationIgnoreCaseAndTravelDate(
                         source,
-                        destination
+                        destination,
+                        travelDate
                 );
     }
     public List<Ride> getDriverTrips(Long driverId) {
@@ -63,5 +71,15 @@ public class RideService {
                         new RuntimeException("Ride not found"));
 
         rideRepository.delete(ride);
+    }
+    public Ride completeRide(Long rideId) {
+
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() ->
+                        new RuntimeException("Ride not found"));
+
+        ride.setStatus("COMPLETED");
+
+        return rideRepository.save(ride);
     }
 }

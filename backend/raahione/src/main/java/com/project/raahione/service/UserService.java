@@ -1,10 +1,14 @@
 package com.project.raahione.service;
 
+import com.project.raahione.dto.AuthResponse;
 import com.project.raahione.dto.RegisterRequest;
+import com.project.raahione.dto.UpdateProfileRequest;
 import com.project.raahione.entity.User;
 import com.project.raahione.repository.BookingRepository;
 import com.project.raahione.repository.UserRepository;
+import com.project.raahione.security.JwtService;
 import org.springframework.stereotype.Service;
+
 
 import com.project.raahione.dto.LoginRequest;
 import java.util.Optional;
@@ -18,13 +22,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
+    private final JwtService jwtService;
 
     public UserService(
             UserRepository userRepository,
-            BookingRepository bookingRepository) {
+            BookingRepository bookingRepository,
+            JwtService jwtService) {
 
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
+        this.jwtService = jwtService;
     }
 
     public User register(RegisterRequest request) {
@@ -65,7 +72,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request) {
 
         if (
                 "admin@gmail.com".equals(request.getEmail())
@@ -80,7 +87,16 @@ public class UserService {
             admin.setEmail("admin@gmail.com");
             admin.setRole("ADMIN");
 
-            return admin;
+            String token =
+                    jwtService.generateToken(
+                            admin.getEmail()
+                    );
+
+            return new AuthResponse(
+                    token,
+                    admin.getRole(),
+                    admin.getId()
+            );
         }
 
         Optional<User> user =
@@ -96,7 +112,16 @@ public class UserService {
             throw new RuntimeException("Invalid password");
         }
 
-        return user.get();
+        String token =
+                jwtService.generateToken(
+                        user.get().getEmail()
+                );
+
+        return new AuthResponse(
+                token,
+                user.get().getRole(),
+                user.get().getId()
+        );
     }
     public User getUserById(Long id) {
 
@@ -124,5 +149,23 @@ public class UserService {
 
         userRepository.delete(user);
 
+    }
+
+    public User updateProfile(
+            Long userId,
+            UpdateProfileRequest request
+    ) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        user.setCity(request.getCity());
+        user.setBio(request.getBio());
+
+        return userRepository.save(user);
     }
 }

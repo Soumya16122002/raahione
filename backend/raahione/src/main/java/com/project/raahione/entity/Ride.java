@@ -21,6 +21,9 @@ public class Ride {
     private String departureTime;
 
     private Integer availableSeats;
+    private String status;
+    private String travelDate;
+    private String travelTime;
 
     @ManyToOne
     @JoinColumn(name = "driver_id")

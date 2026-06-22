@@ -2,6 +2,18 @@
 
 import { useState } from "react";
 import axios from "axios";
+const API_BASE_URL = "raahione-backend-production.up.railway.app";
+axios.interceptors.request.use((config) => {
+
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    config.headers.Authorization =
+      `Bearer ${token}`;
+  }
+
+  return config;
+});
 
 function App() {
   const [name, setName] = useState("");
@@ -30,6 +42,17 @@ function App() {
   const [rideDestination, setRideDestination] = useState("");
   const [rideDepartureTime, setRideDepartureTime] = useState("");
   const [rideSeats, setRideSeats] = useState("");
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState("");
+  const [ratings, setRatings] = useState([]);
+  const [allRatings, setAllRatings] = useState([]);
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [bio, setBio] = useState("");
+  const [travelDate, setTravelDate] = useState("");
+  const [travelTime, setTravelTime] = useState("");
+  const [searchDate, setSearchDate] = useState("");
+  const [searchTime, setSearchTime] = useState("");
 
   const register = async () => {
   if (
@@ -41,13 +64,23 @@ function App() {
     return;
   }
     try {
-      const response = await axios.post("https://raahione-backend-production-321b.up.railway.app/users/register", {
+      const response = await axios.post(`${API_BASE_URL}/users/register`, {
         name,
         email,
         password,
         role,
+        phone,
+        city,
+        bio
       });
       alert("User Registered Successfully");
+      setName("");
+      setEmail("");
+      setPassword("");
+      setPhone("");
+      setCity("");
+      setBio("");
+      setRole("USER");
 
     } catch (error) {
 
@@ -57,22 +90,70 @@ function App() {
 
   const login = async () => {
     try {
-      const response = await axios.post("https://raahione-backend-production-321b.up.railway.app/users/login", {
+      const response = await axios.post(`${API_BASE_URL}/users/login`, {
         email: loginEmail,
         password: loginPassword,
       });
-      localStorage.setItem("user", JSON.stringify(response.data));
-      setCurrentUser(response.data);
+      localStorage.setItem("token", response.data.token);
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          id: response.data.userId,
+          role: response.data.role
+        })
+      );
+      setBookings([]);
+      setDriverBookings([]);
+      setApprovedBookings([]);
+      setDriverTrips([]);
+      setRides([]);
+      setRecommendations([]);
+      setCurrentUser({
+        id: response.data.userId,
+        role: response.data.role
+      });
+      if (response.data.role === "USER") {
+        loadBookings();
+      }
+
+      if (response.data.role === "DRIVER") {
+        loadDriverBookings();
+        loadDriverTrips();
+      }
       alert("Login Successful");
+      setLoginEmail("");
+      setLoginPassword("");
     } catch (error) {
 
       alert("Login Failed");
     }
   };
+  const logout = () => {
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    setCurrentUser(null);
+
+    setLoginEmail("");
+    setLoginPassword("");
+
+    setBookings([]);
+    setDriverBookings([]);
+    setApprovedBookings([]);
+    setDriverTrips([]);
+    setRides([]);
+    setRecommendations([]);
+    setUsers([]);
+    setAllRides([]);
+    setAllBookings([]);
+    setAnalytics(null);
+  };
 
   const searchRides = async () => {
     try {
-      const url = "https://raahione-backend-production-321b.up.railway.app/rides/search?source=" + source + "&destination=" + destination;
+     const url = `${API_BASE_URL}/rides/search?source=${source}&destination=${destination}&travelDate=${searchDate}`;
       const response = await axios.get(url);
       setRides(response.data);
     } catch (error) {
@@ -88,7 +169,7 @@ function App() {
       );
 
       const response = await axios.post(
-        "https://raahione-backend-production-321b.up.railway.app/recommendations",
+        `${API_BASE_URL}/recommendations`,
         {
           userId: user.id,
           currentSource: source
@@ -105,7 +186,7 @@ function App() {
   const bookRide = async (rideId) => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      await axios.post("https://raahione-backend-production-321b.up.railway.app/bookings", {
+      await axios.post(`${API_BASE_URL}/bookings`, {
         userId: user.id,
         rideId: rideId,
         seatsBooked: 1,
@@ -121,7 +202,7 @@ function App() {
       const user = JSON.parse(localStorage.getItem("user"));
 
       const response = await axios.get(
-        "https://raahione-backend-production-321b.up.railway.app/bookings/history/" + user.id
+        `${API_BASE_URL}/bookings/history/` + user.id
       );
 
       setBookings(response.data);
@@ -138,7 +219,7 @@ function App() {
       );
 
       const response = await axios.get(
-        "https://raahione-backend-production-321b.up.railway.app/rides/driver/" + user.id
+        `${API_BASE_URL}/rides/driver/` + user.id
       );
 
       setDriverTrips(response.data);
@@ -151,7 +232,7 @@ function App() {
   const cancelBooking = async (bookingId) => {
     try {
       await axios.put(
-        "https://raahione-backend-production-321b.up.railway.app/bookings/cancel/" + bookingId
+        `${API_BASE_URL}/bookings/cancel/` + bookingId
       );
 
       alert("Booking Cancelled");
@@ -169,7 +250,7 @@ function App() {
       );
 
       const response = await axios.get(
-        "https://raahione-backend-production-321b.up.railway.app/bookings/driver/" + user.id
+        `${API_BASE_URL}/bookings/driver/` + user.id
       );
 
 
@@ -193,7 +274,7 @@ function App() {
     try {
 
       await axios.put(
-        "https://raahione-backend-production-321b.up.railway.app/bookings/approve/" + bookingId
+        `${API_BASE_URL}/bookings/approve/`+ bookingId
       );
 
       loadDriverBookings();
@@ -207,7 +288,7 @@ function App() {
     try {
 
       await axios.put(
-        "https://raahione-backend-production-321b.up.railway.app/bookings/reject/" + bookingId
+        `${API_BASE_URL}/bookings/reject/` + bookingId
       );
 
       loadDriverBookings();
@@ -224,13 +305,15 @@ function App() {
       );
 
       const response = await axios.post(
-        "https://raahione-backend-production-321b.up.railway.app/rides",
+        `${API_BASE_URL}/rides`,
         {
-          source: rideSource,
-          destination: rideDestination,
-          departureTime: rideDepartureTime,
-          availableSeats: parseInt(rideSeats),
-          driverId: user.id,
+              source: rideSource,
+              destination: rideDestination,
+              departureTime: rideDepartureTime,
+              travelDate: travelDate,
+              travelTime: travelTime,
+              availableSeats: parseInt(rideSeats),
+              driverId: user.id,
         }
       );
 
@@ -244,28 +327,28 @@ function App() {
   };
   const loadUsers = async () => {
     const response = await axios.get(
-      "https://raahione-backend-production-321b.up.railway.app/users"
+      `${API_BASE_URL}/users`
     );
     setUsers(response.data);
   };
 
   const loadAllRides = async () => {
     const response = await axios.get(
-      "https://raahione-backend-production-321b.up.railway.app/rides"
+      `${API_BASE_URL}/rides`
     );
     setAllRides(response.data);
   };
 
   const loadAllBookings = async () => {
     const response = await axios.get(
-      "https://raahione-backend-production-321b.up.railway.app/admin/bookings"
+      `${API_BASE_URL}/admin/bookings`
     );
     setAllBookings(response.data);
   };
 
   const loadAnalytics = async () => {
     const response = await axios.get(
-      "https://raahione-backend-production-321b.up.railway.app/admin/analytics"
+      `${API_BASE_URL}/admin/analytics`
     );
     setAnalytics(response.data);
   };
@@ -273,7 +356,7 @@ function App() {
   const deleteUser = async (userId) => {
     try {
       await axios.delete(
-        "https://raahione-backend-production-321b.up.railway.app/users/" + userId
+        `${API_BASE_URL}/users/` + userId
       );
 
       loadUsers();
@@ -289,7 +372,7 @@ function App() {
   const deleteRide = async (rideId) => {
     try {
       await axios.delete(
-        "https://raahione-backend-production-321b.up.railway.app/rides/" + rideId
+        `${API_BASE_URL}/rides/` + rideId
       );
 
       loadAllRides();
@@ -298,10 +381,94 @@ function App() {
       alert("Cannot delete ride");
     }
   };
-  
+  const submitRating = async (rideId) => {
+
+    try {
+
+      const user = JSON.parse(
+        localStorage.getItem("user")
+      );
+
+      await axios.post(
+        `${API_BASE_URL}/ratings`,
+        {
+          userId: user.id,
+          rideId: rideId,
+          rating: parseInt(rating),
+          review: review
+        }
+      );
+
+      alert("Rating Submitted");
+
+      setRating("");
+      setReview("");
+
+    } catch (error) {
+
+      alert(
+        error.response?.data?.message ||
+        "Rating Failed"
+      );
+    }
+  };
+  const loadRatings = async (rideId) => {
+
+    try {
+
+      const response = await axios.get(
+        `${API_BASE_URL}/ratings/ride/` + rideId
+      );
+
+      setRatings(response.data);
+
+    } catch (error) {
+
+      alert("Failed To Load Ratings");
+    }
+  };
+  const loadAllRatings = async () => {
+
+    try {
+
+      const response = await axios.get(
+        `${API_BASE_URL}/ratings`
+      );
+
+      setAllRatings(response.data);
+
+    } catch (error) {
+
+      alert("Failed To Load Ratings");
+    }
+  };
+  const completeRide = async (rideId) => {
+
+    try {
+
+      await axios.put(
+        `${API_BASE_URL}/rides/complete/` + rideId
+      );
+
+      alert("Ride Completed");
+
+      loadDriverTrips();
+
+    } catch (error) {
+
+      alert("Failed To Complete Ride");
+    }
+  };
 
   return (
     <div style={{ padding: "30px" }}>
+
+      {loggedUser && (
+        <button onClick={logout}>
+          Logout
+        </button>
+      )}
+
       <h1>Raahione Ride Sharing</h1>
       <hr />
       <h2>Register</h2>
@@ -311,6 +478,27 @@ function App() {
       <br /><br />
       <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
       <br /><br />
+      <input
+        placeholder="Phone"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+      />
+
+      <br /><br />
+
+      <input
+        placeholder="City"
+        value={city}
+        onChange={(e) => setCity(e.target.value)}
+      />
+
+      <br /><br />
+
+      <input
+        placeholder="Bio"
+        value={bio}
+        onChange={(e) => setBio(e.target.value)}
+      />
       <select
         value={role}
         onChange={(e) => setRole(e.target.value)}
@@ -352,6 +540,7 @@ function App() {
           setRideDestination(e.target.value)
         }
       />
+      <br /><br />
 
       <br /><br />
 
@@ -360,6 +549,25 @@ function App() {
         value={rideDepartureTime}
         onChange={(e) =>
           setRideDepartureTime(e.target.value)
+        }
+      />
+      <br /><br />
+
+      <input
+        type="date"
+        value={travelDate}
+        onChange={(e) =>
+          setTravelDate(e.target.value)
+        }
+      />
+
+      <br /><br />
+
+      <input
+        type="time"
+        value={travelTime}
+        onChange={(e) =>
+          setTravelTime(e.target.value)
         }
       />
 
@@ -457,6 +665,36 @@ function App() {
           <p>Ride ID: {ride.id}</p>
           <p>Source: {ride.source}</p>
           <p>Destination: {ride.destination}</p>
+          <p>Status: {ride.status}</p>
+
+          {ride.status !== "COMPLETED" && (
+            <button
+              onClick={() => completeRide(ride.id)}
+            >
+              Complete Ride
+            </button>
+          )}
+          <button
+            onClick={() => loadRatings(ride.id)}
+          >
+            View Ratings
+          </button>
+          {ratings.map((rating) => (
+            <div
+              key={rating.id}
+              style={{
+                border: "1px solid gray",
+                padding: "5px",
+                marginTop: "5px"
+              }}
+            >
+              <p>
+                {"⭐".repeat(rating.rating)}
+              </p>
+              <p>Review: {rating.review}</p>
+              <p>User: {rating.user.name}</p>
+            </div>
+          ))}
         </div>
       ))}
 
@@ -470,6 +708,20 @@ function App() {
       <br /><br />
       <input placeholder="Destination" value={destination} onChange={(e) => setDestination(e.target.value)} />
       <br /><br />
+
+      <input
+        type="date"
+        value={searchDate}
+        onChange={(e) => setSearchDate(e.target.value)}
+      />
+      <br /><br />
+      <input
+        type="time"
+        value={searchTime}
+        onChange={(e) => setSearchTime(e.target.value)}
+      />
+      <br /><br />
+
       <button
         onClick={() => {
           searchRides();
@@ -535,9 +787,50 @@ function App() {
           <p>Booking ID: {booking.id}</p>
           <p>Status: {booking.status}</p>
           <p>Seats Booked: {booking.seatsBooked}</p>
+          {booking.status === "APPROVED" && (
+            <>
+              <br />
+
+             <div>
+               {[1, 2, 3, 4, 5].map((star) => (
+                 <span
+                   key={star}
+                   onClick={() => setRating(star)}
+                   style={{
+                     cursor: "pointer",
+                     fontSize: "25px"
+                   }}
+                 >
+                   {star <= rating ? "⭐" : "☆"}
+                 </span>
+               ))}
+             </div>
+
+              <br /><br />
+
+              <input
+                placeholder="Review"
+                value={review}
+                onChange={(e) =>
+                  setReview(e.target.value)
+                }
+              />
+
+              <br /><br />
+
+              <button
+                onClick={() =>
+                  submitRating(booking.ride.id)
+                }
+              >
+                Submit Rating
+              </button>
+            </>
+          )}
 
           {(booking.status === "APPROVED" ||
-            booking.status === "PENDING") && (
+            booking.status === "PENDING") &&
+            booking.ride.status !== "COMPLETED" && (
             <button
               onClick={() =>
                 cancelBooking(booking.id)
@@ -571,6 +864,9 @@ function App() {
 
           <button onClick={loadAllBookings}>
             Load Bookings
+          </button>
+          <button onClick={loadAllRatings}>
+            Load Ratings
           </button>
 
           <br /><br />
@@ -626,10 +922,35 @@ function App() {
           <h3>Bookings</h3>
 
           {allBookings.map((booking) => (
+
             <div key={booking.id}>
               Booking #{booking.id}
               {" - "}
               {booking.status}
+            </div>
+          ))}
+          <hr />
+
+          <h3>Ratings</h3>
+
+          {allRatings.map((rating) => (
+            <div
+              key={rating.id}
+              style={{
+                border: "1px solid gray",
+                padding: "10px",
+                marginBottom: "10px"
+              }}
+            >
+              <p>Driver: {rating.ride.driver.name}</p>
+
+              <p>User: {rating.user.name}</p>
+
+              <p>
+                {"⭐".repeat(rating.rating)}
+              </p>
+
+              <p>{rating.review}</p>
             </div>
           ))}
         </>

@@ -12,4 +12,9 @@ public interface BookingRepository
     List<Booking> findByRideDriverId(Long driverId);
 
     List<Booking> findTop10ByUserIdOrderByIdDesc(Long userId);
+    boolean existsByUserIdAndRideIdAndStatus(
+            Long userId,
+            Long rideId,
+            String status
+    );
 }

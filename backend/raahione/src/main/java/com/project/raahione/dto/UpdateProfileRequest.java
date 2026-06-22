@@ -1,17 +1,12 @@
 package com.project.raahione.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-public class RegisterRequest {
+@Data
+public class UpdateProfileRequest {
 
     private String name;
     private String email;
-    private String password;
-    private String role;
-
     private String phone;
     private String city;
     private String bio;

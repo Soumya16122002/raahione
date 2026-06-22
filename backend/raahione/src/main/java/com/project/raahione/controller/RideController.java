@@ -22,11 +22,13 @@ public class RideController {
     @GetMapping("/search")
     public List<Ride> searchRides(
             @RequestParam String source,
-            @RequestParam String destination) {
+            @RequestParam String destination,
+            @RequestParam String travelDate) {
 
         return rideService.searchRides(
                 source,
-                destination
+                destination,
+                travelDate
         );
     }
     @GetMapping("/driver/{driverId}")
@@ -41,8 +43,15 @@ public class RideController {
 
         rideService.deleteRide(rideId);
     }
+    @PutMapping("/complete/{rideId}")
+    public Ride completeRide(
+            @PathVariable Long rideId
+    ) {
+        return rideService.completeRide(rideId);
+    }
     @GetMapping
     public List<Ride> getAllRides() {
         return rideService.getAllRides();
     }
+
 }

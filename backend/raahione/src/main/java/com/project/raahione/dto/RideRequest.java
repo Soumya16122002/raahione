@@ -1,5 +1,8 @@
 package com.project.raahione.dto;
 
+import lombok.Data;
+
+@Data
 public class RideRequest {
 
     private String source;
@@ -8,43 +11,7 @@ public class RideRequest {
     private Integer availableSeats;
     private Long driverId;
 
-    public String getSource() {
-        return source;
-    }
+    private String travelDate;
+    private String travelTime;
 
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public String getDestination() {
-        return destination;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
-
-    public String getDepartureTime() {
-        return departureTime;
-    }
-
-    public void setDepartureTime(String departureTime) {
-        this.departureTime = departureTime;
-    }
-
-    public Integer getAvailableSeats() {
-        return availableSeats;
-    }
-
-    public void setAvailableSeats(Integer availableSeats) {
-        this.availableSeats = availableSeats;
-    }
-
-    public Long getDriverId() {
-        return driverId;
-    }
-
-    public void setDriverId(Long driverId) {
-        this.driverId = driverId;
-    }
 }
