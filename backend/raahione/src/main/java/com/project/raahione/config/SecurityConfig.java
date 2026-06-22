@@ -37,10 +37,11 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/users/login",
-                                "/users/register"
+                                "/users/register",
+                                "/health"
                         ).permitAll()
 
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
 
                 .addFilterBefore(
