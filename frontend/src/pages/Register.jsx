@@ -11,14 +11,23 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      await api.post("/users/register", {
+      const response = await api.post("/users/register", {
         name,
         email,
         password,
         role,
       });
 
-      alert("Registration Successful");
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("role", response.data.role);
+      localStorage.setItem("userId", response.data.userId);
+
+      if (response.data.role === "USER") {
+        window.location.replace("/user");
+      } else {
+        window.location.replace("/driver");
+      }
+
     } catch (error) {
       console.error(error);
       alert("Registration Failed");
