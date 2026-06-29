@@ -24,6 +24,17 @@ public class RideService {
 
         User driver =
                 userService.getUserById(request.getDriverId());
+        Ride activeRide =
+                rideRepository.findByDriverIdAndStatus(
+                        driver.getId(),
+                        "ACTIVE"
+                );
+
+        if (activeRide != null) {
+            throw new RuntimeException(
+                    "You already have an active ride. Complete it before creating another."
+            );
+        }
 
         if (!"DRIVER".equals(driver.getRole())) {
             throw new RuntimeException(

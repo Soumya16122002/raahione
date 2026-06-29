@@ -22,4 +22,5 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             String destination,
             Integer seats
     );
+    Ride findByDriverIdAndStatus(Long driverId, String status);
 }

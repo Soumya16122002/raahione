@@ -1,0 +1,1 @@
+jdbc:postgresql://ep-silent-lab-aocdd3by-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?user=neondb_owner&password=npg_dVvIKSP6CUN4&sslmode=require&channelBinding=require
